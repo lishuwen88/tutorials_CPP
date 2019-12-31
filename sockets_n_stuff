@@ -1,0 +1,243 @@
+/// Reads n bytes from fd.
+bool readNBytes(int fd, void *buf, std::size_t n) {
+    std::size_t offset = 0;
+    char *cbuf = reinterpret_cast<char*>(buf);
+    while (true) {
+        ssize_t ret = recv(fd, cbuf + offset, n - offset, MSG_WAITALL);
+        if (ret < 0 && errno != EINTR) {
+            // Error occurred
+            throw IOException(strerror(errno));
+        } else if (ret == 0) {
+            // No data available anymore
+            if (offset == 0) return false;
+            else             throw ProtocolException("Unexpected end of stream");
+        } else if (offset + ret == n) {
+            // All n bytes read
+            return true;
+        } else {
+            offset += ret;
+        }
+    }
+}
+
+/// Reads message from fd
+std::vector<char> readMessage(int fd) {
+    std::uint64_t size;
+    if (readNBytes(fd, &size, sizeof(size))) {
+        std::vector buf(size);
+        if (readNBytes(fd, buf.data(), size)) {
+            return buf;
+        } else {
+            throw ProtocolException("Unexpected end of stream");
+        }
+    } else {
+        // connection was closed
+        return std::vector<char>();
+        
+// Or you can read into small (possibly fixed size) buffers and collect them into a std::vector, possibly also storing some flag to detect when a message is complete, and then just process the entire message iterating through the vector
+
+// memcpy(dest, &buf, buf)
+
+#include <iostream>
+#include <cstring>
+
+int main() {
+    unsigned char bytes[4]{ 0xdd, 0xcc, 0xbb, 0xaa };
+
+    int value;
+    std::memcpy(&value, bytes, sizeof(int));
+
+    std::cout << std::hex << value << '\n';
+}
+
+// another same way
+int value;
+assert(sizeof value == sizeof bytes);
+std::memcpy(&value, bytes, sizeof bytes);
+
+
+// an idea, flag between reading header size and msg
+int receive(socket sock, char * buffer, int chunk_size)
+{
+    int offset = 0;
+
+    while (chunk_size > 0)
+    {
+        // add select() here when you have a non-blocking socket.
+        int n = recv(sock, buffer+offset, chunk_size);
+        // TODO: error handling
+        offset += n;
+        chunk_size -= n;
+    }
+
+    // return amount of received bytes
+    return offset;
+}
+
+void do_receive(void)
+{
+    struct {
+        int size;
+        // other message information
+    } header;
+
+    while (true)
+    {
+        receive(sock, &header, sizeof(header);
+        receive(sock, buffer, header.size);
+        process_message(buffer, header.size);
+    }
+}
+
+
+// byte array to int
+inline int16_t ReadINT16(uint8_t *ByteArray, int32_t Offset)
+{
+    int16_t result;
+    memcpy(&result, ByteArray+Offset, sizeof(int16_t));
+    return result;
+};
+
+// c++17 std::byte
+#include <cstddef>
+int main()
+{
+    std::byte myByte{ 2 };
+}
+
+#include <iostream>
+#include <cstddef>
+ 
+int main()
+{
+    std::byte myByte{ 2 };
+    std::cout << std::to_integer<int>(myByte) << std::endl;
+}
+
+#include <iostream>
+#include <cstddef>
+ 
+using namespace std;
+ 
+void PrintByte(const byte& aByte)
+{
+    cout << to_integer<int>(aByte) << endl;
+}
+ 
+int main()
+{
+    byte myByte{ 2 };
+    PrintByte(myByte);  // 2
+ 
+    // A 2-bit left shift
+    myByte <<= 2;
+    PrintByte(myByte);  // 8
+ 
+    // Initialize two new bytes using binary literals.
+    byte byte1{ 0b0011 };
+    byte byte2{ 0b1010 };
+    PrintByte(byte1);   // 3
+    PrintByte(byte2);   // 10
+ 
+    // Bit-wise OR and AND operations
+    byte byteOr = byte1 | byte2;
+    byte byteAnd = byte1 & byte2;
+    PrintByte(byteOr);  // 11
+    PrintByte(byteAnd); // 2
+}
+
+// std::vector<std::byte>.
+void SomeCApi(unsigned char* buffer, unsigned int size)
+{
+    for (unsigned char index = 0; index < size; ++index) {
+        buffer[index] = index;
+    }
+}
+ 
+int main()
+{
+    std::vector<std::byte> buffer{ 100 };
+    SomeCApi(reinterpret_cast<unsigned char*>(&buffer[0]), buffer.size());
+ 
+    for (const auto& element : buffer) { PrintByte(element); }
+}
+
+
+// structs into bytes
+struct S
+{
+    int a;
+    int b;
+    // etc.
+};
+
+S my_s;
+
+char* my_s_bytes = reinterpret_cast<char*>(&my_s);
+
+// or, if you prefer static_cast:
+char* my_s_bytes = static_cast<char*>(static_cast<void*>(&my_s));
+
+// I like to use a union.
+
+typedef struct b {
+  unsigned int x;
+  unsigned int y;
+} b_s;
+
+typedef union a {
+  b_s my_struct;
+  char ary[sizeof(b_s)];
+} a_u;
+
+// char ptr way
+(char*)&someStruct
+ /*
+ You do things in the wrong order, the expression
+
+&struct_data+i
+takes the address of struct_data and increases it by i times the size of the structure.
+
+Try this instead:
+
+*((char *) &struct_data + i)
+This converts the address of struct_data to a char * and then adds the index, and then uses the dereference operator (unary *) to get the "char" at that address.
+*/
+
+// another one using ptrs
+for(unsigned int i = 0; i<sizeof(struct_data); i++){
+    // +i has to be outside of the parentheses in order to increment the address
+    // by the size of a char. Otherwise you would increment by the size of
+    // struct_data. You also have to dereference the whole thing, or you will
+    // assign an address to data[i]
+    data[i] = *((char*)(&struct_data) + i); 
+}
+
+AMG_ANGLES* tmp = (AMG_ANGLES*)data; //Re-Make the struct
+//tmp is a pointer so you have to use -> which is shorthand for (*tmp).yaw
+cout << tmp->yaw; 
+}
+
+// memcpy way
+struct AMG_ANGLES {
+    float yaw;
+    float pitch;
+    float roll;
+};
+
+int main() {
+    AMG_ANGLES struct_data;
+
+    struct_data.yaw = 87.96;
+    struct_data.pitch = -114.58;
+    struct_data.roll = 100.50;
+
+    //Sending Side
+    char b[sizeof(struct_data)];
+    memcpy(b, &struct_data, sizeof(struct_data));
+
+    //Receiving Side
+    AMG_ANGLES tmp; //Re-make the struct
+    memcpy(&tmp, b, sizeof(tmp));
+    cout << tmp.yaw; //Display the yaw to see if it's correct
+}
