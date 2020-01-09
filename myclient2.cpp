@@ -31,7 +31,7 @@ int main()
 	// Create a hint structure for the server we're connecting with
 	// ("127.0.0.1", 11099)
 	int port = 11099;
-	std::string ipAddress = "127.0.0.1";
+	std::string ipAddress = "192.168.1.100";
 
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
@@ -115,12 +115,12 @@ int main()
 	logon_req.HeartbeatIntervalInSeconds = HRTBT;
 	
 	// Send to server
-	char bytes2send2[logon_req.Size];
-	memcpy(bytes2send2, &logon_req, logon_req.Size);
-	int sendlogon = send(sock, bytes2send2, logon_req.Size, 0);
+	char bytes2send[logon_req.Size];
+	memcpy(bytes2send, &logon_req, logon_req.Size);
+	int sendRes = send(sock, bytes2send, logon_req.Size, 0);
 	
 	// Check if failed
-	if (sendlogon == -1)
+	if (sendRes == -1)
 	{
 		std::cout << "Could not send to server! Whoops!\r\n";
 		//continue;
@@ -155,31 +155,11 @@ int main()
 		// combine header and message into 1 byte array
 
 		enc_resp.CopyFrom(static_cast<void*>(buf));
-		std::cout << "Logon_Resp: Size: " << logon_resp.Size << std::endl;
-		std::cout << "Logon_Resp: Type: " << logon_resp.Type << std::endl;
-		std::cout << "Logon_Resp: ProtocolVersion: " << logon_resp.ProtocolVersion << std::endl;
-		std::cout << "Logon_Resp: Result: " << logon_resp.GetResult() << std::endl;
-		std::cout << "Logon_Resp: Resultdirect: " << logon_resp.Result << std::endl;
-		std::cout << "Logon_Resp: Resulttext: " << logon_resp.GetResultText() << std::endl;
-		
-		std::cout << "Logon_Resp: Resulttext direct: " << logon_resp.ResultText << std::endl;
-		std::cout << "Logon_Resp: ReconnectAddress: " << logon_resp.ReconnectAddress << std::endl;
-		std::cout << "Logon_Resp: integer1: " << logon_resp.Integer_1 << std::endl;
-		std::cout << "Logon_Resp: Servername: " << logon_resp.ServerName << std::endl;
-		std::cout << "Logon_Resp: Mktdepthupdateblable: " << logon_resp.MarketDepthUpdatesBestBidAndAsk << std::endl;
-		std::cout << "Logon_Resp: TradingIsSupported: " << logon_resp.TradingIsSupported << std::endl;
-		std::cout << "Logon_Resp: OCOsupported: " << logon_resp.OCOOrdersSupported << std::endl;
-		std::cout << "Logon_Resp: OrderCancelReplaceSuppported: " << logon_resp.OrderCancelReplaceSupported << std::endl;
-		std::cout << "Logon_Resp: SymbolExchangeDelimiteder: " << logon_resp.SymbolExchangeDelimiter << std::endl;
-		std::cout << "Logon_Resp: SecurityDefSupported: " << logon_resp.SecurityDefinitionsSupported << std::endl;
-		std::cout << "Logon_Resp: HistoricalPriceDataSupported: " << logon_resp.HistoricalPriceDataSupported << std::endl;
-		std::cout << "Logon_Resp: ResubscribeWhenMarketDataFeedAvailable " << logon_resp.ResubscribeWhenMarketDataFeedAvailable << std::endl;
-		std::cout << "Logon_Resp: MarketDepthIsSupported " << logon_resp.MarketDepthIsSupported << std::endl;
-		std::cout << "Logon_Resp: OneHistoricalPriceDatablabla " << logon_resp.OneHistoricalPriceDataRequestPerConnection << std::endl;
-		std::cout << "Logon_Resp: BracketSupported " << logon_resp.BracketOrdersSupported << std::endl;
-		std::cout << "Logon_Resp: UseIntegerPriceOrderMsg " << logon_resp.UseIntegerPriceOrderMessages << std::endl;
-		std::cout << "Logon_Resp: UsesMultiplePos-SymNacc " << logon_resp.UsesMultiplePositionsPerSymbolAndTradeAccount << std::endl;
-		std::cout << "Logon_Resp: MarketDataSupported " << logon_resp.MarketDataSupported << std::endl;
+		std::cout << "Enc_Resp: Size " << enc_resp.Size << std::endl;
+		std::cout << "Enc_Resp: Type " << enc_resp.Type << std::endl;
+		std::cout << "Enc_Resp: ProtocolVersion " << enc_resp.ProtocolVersion << std::endl;
+		std::cout << "Enc_Resp: Encoding " << enc_resp.Encoding << std::endl;
+		std::cout << "Enc_Resp: ProtocolType " << enc_resp.ProtocolType << std::endl;
 
 	}
 

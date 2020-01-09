@@ -1,7 +1,8 @@
 #include <iostream>
 #include <chrono>
-#include <ctime>
+//#include <ctime>
 #include <iomanip>
+#include <typeinfo>
 
 volatile int sink;
 int main()
@@ -21,7 +22,13 @@ int main()
 
 	time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 	std::cout << std::put_time(std::localtime(&now), "%F %T") <<  "\n";
-      
-	return 0;
+    
+    
+	time_t now2 = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	auto t6 =  std::put_time(std::localtime(&now2), "%F %T");
+	std::cout << "t6: " << t6 << "\n";
+	std::cout << "type: " << typeid(t6).name() << "\n";
+    
+    return 0;
 
 }

@@ -31,7 +31,8 @@ int main()
 	// Create a hint structure for the server we're connecting with
 	// ("127.0.0.1", 11099)
 	int port = 11099;
-	std::string ipAddress = "127.0.0.1";
+	std::string ipAddress = "192.168.1.100";
+	//std::string ipAddress = "127.0.0.1";
 
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
@@ -145,7 +146,7 @@ int main()
 		//std::cout << "SERVER> " << std::string(buf, bytesReceived) << "\r\n";
 		
 		// Get rest of message
-		DTC::s_LogonResponse logon_resp;
+		//DTC::s_LogonResponse logon_resp;
 		u_int16_t m_size = header.size - 4;
 		std::cout << "  m_size: " << m_size << std::endl;
 		memset(buf + 4, 0, m_size);
@@ -154,7 +155,7 @@ int main()
 		
 		// combine header and message into 1 byte array
 
-		enc_resp.CopyFrom(static_cast<void*>(buf));
+		logon_resp.CopyFrom(static_cast<void*>(buf));
 		std::cout << "Logon_Resp: Size: " << logon_resp.Size << std::endl;
 		std::cout << "Logon_Resp: Type: " << logon_resp.Type << std::endl;
 		std::cout << "Logon_Resp: ProtocolVersion: " << logon_resp.ProtocolVersion << std::endl;
@@ -179,7 +180,7 @@ int main()
 		std::cout << "Logon_Resp: BracketSupported " << logon_resp.BracketOrdersSupported << std::endl;
 		std::cout << "Logon_Resp: UseIntegerPriceOrderMsg " << logon_resp.UseIntegerPriceOrderMessages << std::endl;
 		std::cout << "Logon_Resp: UsesMultiplePos-SymNacc " << logon_resp.UsesMultiplePositionsPerSymbolAndTradeAccount << std::endl;
-		std::cout << "Logon_Resp: MarketDataSupported " << logon_resp.MarketDataSupported << std::endl;
+		std::cout << "Logon_Resp: MarketDataSupported: " << logon_resp.MarketDataSupported << std::endl;
 
 	}
 
